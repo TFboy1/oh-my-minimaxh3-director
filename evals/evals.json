@@ -26,7 +26,7 @@
       "id": 4,
       "name": "first-use-onboarding",
       "prompt": "我第一次用 oh-my-minimaxh3-director，想把自己的剧本做成视频。我还没装 ComfyUI，也不知道我的电脑能不能跑 MiniMax H3。",
-      "expected_output": "依次说明用途并询问：是否启用自动更新；探测/询问 ComfyUI 并给出官网桌面版下载教程；运行 check_hardware.py 评估硬件并给出结论；给 ModelScope 模型下载教程；逐个说明用途后询问是否安装 h3-prompt-writing、jianying-editor 与 comfy-mcp；把选择写入 ~/.oh-my-minimaxh3-director.json。",
+      "expected_output": "依次说明用途并询问：是否启用自动更新；询问 ComfyUI 是本地还是云端——本地则探测 8188 并给官网桌面版下载教程，云端则请用户提供网址链接并用 probe_comfy.py --url 验证写入 pipeline-config；运行 check_hardware.py 评估硬件并给出结论；给 ModelScope 模型下载教程；逐个说明用途后询问是否安装 h3-prompt-writing、jianying-editor 与 comfy-mcp；把选择（含 comfyui_location）写入 ~/.oh-my-minimaxh3-director.json。",
       "files": []
     },
     {

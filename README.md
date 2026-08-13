@@ -54,7 +54,8 @@ git clone https://github.com/TFboy1/oh-my-minimaxh3-director.git
 第一次调用时，skill 会按顺序与你确认，每项都会先说明用途：
 
 1. 是否启用**自动更新**（推荐启用）；
-2. 是否已安装 **ComfyUI**（未安装会给官网桌面版下载教程）；
+2. **ComfyUI 是本地还是云端**（本地探测 8188 / 未安装给下载教程；云端请你
+   提供 trycloudflare 或 AutoDL 网址链接）；
 3. 运行**硬件检测**，判断本机能不能带动 MiniMax H3；
 4. 是否已下载 **MiniMax H3 模型**（未下载给 ModelScope 教程）；
 5. 是否安装可选依赖：`h3-prompt-writing`（提示词）、`jianying-editor`

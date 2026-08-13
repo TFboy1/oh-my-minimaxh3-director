@@ -23,10 +23,17 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 
 1. **自动更新**：说明用途（每次使用前自动拉取本 skill 的最新脚本、模板与
    教程），询问是否启用。推荐启用；选项：启用 / 不启用 / 每次询问。
-2. **ComfyUI 检测**：先运行 `scripts/probe_comfy.py --workspace <工作区根>`
-   自动探测（本机 8188、已有隧道、AutoDL）。探测不到时询问“是否已安装
-   ComfyUI”；未安装则按 [setup-guide.md](references/setup-guide.md) 第 1 节
-   给出官网桌面版下载教程（https://www.comfy.org/download）。
+2. **ComfyUI 位置确认**：询问用户“ComfyUI 是本地运行还是云端？”——
+   - **本地**：运行 `scripts/probe_comfy.py --workspace <工作区根> --write`
+     探测本机 8188；未安装时按 [setup-guide.md](references/setup-guide.md)
+     第 1 节给出官网桌面版下载教程（https://www.comfy.org/download）。
+   - **云端**：请用户提供网址链接（trycloudflare 隧道地址或 AutoDL 的
+     seetacloud 地址），用
+     `scripts/probe_comfy.py --workspace <工作区根> --url <链接> --write`
+     验证并把该地址写入 `.config/pipeline-config.json` 的 `base_url`；
+     链接失效时回退到自动探测。
+   把 `comfyui_location: local | cloud` 与地址记入
+   `~/.oh-my-minimaxh3-director.json`，后续运行不再重复询问。
 3. **硬件评估**：运行 `scripts/check_hardware.py` 检测 NVIDIA 显存、内存与
    磁盘；本机无独显但已有远程 ComfyUI（隧道/AutoDL）时改用
    `--remote-url <地址>` 直接评估远程 GPU。若判定不适合（显存 < 12GB 或

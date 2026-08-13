@@ -23,6 +23,11 @@ ComfyUI、下载 MiniMax H3 模型、评估硬件，以及安装可选依赖。�
 验证：访问 `http://127.0.0.1:8188/system_stats`，返回 JSON 即成功。也可运行
 `scripts/probe_comfy.py --workspace <项目根> --write` 自动探测。
 
+云端用户不需要本步：把 ComfyUI 的网址链接（trycloudflare 隧道地址或 AutoDL
+的 seetacloud 地址）直接提供给 skill，初始化阶段会用
+`scripts/probe_comfy.py --workspace <项目根> --url <链接> --write` 验证并写入
+`.config/pipeline-config.json` 的 `base_url`。
+
 ## 2. 从 ModelScope 下载 MiniMax H3 模型
 
 用途：MiniMax H3 的推理权重（Unet / 文本编码器 / 双 VAE）。ModelScope
