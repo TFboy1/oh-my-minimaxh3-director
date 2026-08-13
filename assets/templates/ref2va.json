@@ -1,0 +1,347 @@
+{
+  "115": {
+    "inputs": {
+      "aspect_ratio": "9:16 (Portrait Widescreen)",
+      "megapixels": 0.4,
+      "multiple": 32
+    },
+    "class_type": "ResolutionSelector",
+    "_meta": {
+      "title": "Resolution Selector (Size)"
+    }
+  },
+  "119": {
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "加载VAE"
+    }
+  },
+  "120": {
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "加载VAE"
+    }
+  },
+  "123": {
+    "inputs": {
+      "sampler_name": "res_multistep"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "K采样器选择"
+    }
+  },
+  "124": {
+    "inputs": {
+      "scheduler": "simple",
+      "steps": 4,
+      "denoise": 1,
+      "model": [
+        "191",
+        0
+      ]
+    },
+    "class_type": "BasicScheduler",
+    "_meta": {
+      "title": "基本调度器"
+    }
+  },
+  "125": {
+    "inputs": {
+      "noise": [
+        "129",
+        0
+      ],
+      "guider": [
+        "126",
+        0
+      ],
+      "sampler": [
+        "123",
+        0
+      ],
+      "sigmas": [
+        "124",
+        0
+      ],
+      "latent_image": [
+        "136",
+        1
+      ]
+    },
+    "class_type": "SamplerCustomAdvanced",
+    "_meta": {
+      "title": "自定义采样器（高级）"
+    }
+  },
+  "126": {
+    "inputs": {
+      "model": [
+        "191",
+        0
+      ],
+      "conditioning": [
+        "136",
+        0
+      ]
+    },
+    "class_type": "BasicGuider",
+    "_meta": {
+      "title": "基本引导器"
+    }
+  },
+  "127": {
+    "inputs": {
+      "unet_name": "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNet加载器"
+    }
+  },
+  "128": {
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "加载CLIP"
+    }
+  },
+  "129": {
+    "inputs": {
+      "noise_seed": 339451577219864
+    },
+    "class_type": "RandomNoise",
+    "_meta": {
+      "title": "随机噪波"
+    }
+  },
+  "131": {
+    "inputs": {
+      "expression": "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17",
+      "values.a": [
+        "132",
+        0
+      ]
+    },
+    "class_type": "ComfyMathExpression",
+    "_meta": {
+      "title": "数学表达式"
+    }
+  },
+  "132": {
+    "inputs": {
+      "value": 5
+    },
+    "class_type": "PrimitiveFloat",
+    "_meta": {
+      "title": "Float (Duration)"
+    }
+  },
+  "136": {
+    "inputs": {
+      "prompt": [
+        "138",
+        0
+      ],
+      "width": [
+        "115",
+        0
+      ],
+      "height": [
+        "115",
+        1
+      ],
+      "length": [
+        "131",
+        1
+      ],
+      "ref_image_size": "match",
+      "clip": [
+        "128",
+        0
+      ],
+      "vae": [
+        "119",
+        0
+      ],
+      "audio_vae": [
+        "120",
+        0
+      ],
+      "ref_images.ref_image_0": [
+        "137",
+        0
+      ],
+      "ref_images.ref_image_1": [
+        "139",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3ReferenceToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Reference to Video"
+    }
+  },
+  "137": {
+    "inputs": {
+      "image": "image_2080ti 22g 300a.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "138": {
+    "inputs": {
+      "value": "一、整体场景描述\n室内居家场景，环境明亮通透、画面质感清新写实。一名25岁高颜值东亚年轻女孩，手持显卡，发现购入的2080ti显卡为假货，面露不满情绪，开口控诉后，起身将手中显卡从敞开的窗户直接抛掷出去，整体画面节奏流畅自然，情绪真实细腻。<Picture 1>是2080ti显卡。<Picture 2>是女孩。\n二、分定时镜头+摄影+音频完整提示块\n镜头1（0-3s）：近景固定镜头\n    摄像机状态：机位固定，平视拍摄，对焦人物面部与手部，画面清晰无虚焦，景深适中，背景轻微虚化突出人物主体。\n    画面内容：25岁东亚漂亮女孩端坐于窗边，双手手持显卡，神情略带气愤与无奈，仔细端详手中显卡，肢体姿态自然写实。\n    音频：环境白噪音（轻柔室内风声），无背景音乐，人声清晰收录。\n    人物台词（清晰口语）：\"妈的，卖我假2080Ti\"\n镜头2（3-6s）：中景跟拍镜头\n    摄像机状态：轻微平稳跟移，跟随人物手部动作、身体姿态微调镜头，全程稳定流畅，画面写实高清。\n 人物台词（清晰口语）：\"去你妈的。\"\n    画面内容：女孩说完台词后，抬手举起手中显卡，身体微微前倾，对准完全敞开的窗户，发力将显卡向外抛掷，动作连贯自然、真实不僵硬。\n    音频：显卡手持轻微摩擦音效、手臂发力轻响、窗户周边轻微风声，无多余杂音，人声收尾干净。"
+    },
+    "class_type": "PrimitiveStringMultiline",
+    "_meta": {
+      "title": "Input Text (Prompt)"
+    }
+  },
+  "139": {
+    "inputs": {
+      "image": "61.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "149": {
+    "inputs": {
+      "samples": [
+        "125",
+        0
+      ],
+      "vae": [
+        "119",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "150": {
+    "inputs": {
+      "samples": [
+        "125",
+        0
+      ],
+      "vae": [
+        "120",
+        0
+      ]
+    },
+    "class_type": "VAEDecodeAudio",
+    "_meta": {
+      "title": "VAE解码（音频）"
+    }
+  },
+  "151": {
+    "inputs": {
+      "fps": 24,
+      "bit_depth": 8,
+      "images": [
+        "149",
+        0
+      ],
+      "audio": [
+        "150",
+        0
+      ]
+    },
+    "class_type": "CreateVideo",
+    "_meta": {
+      "title": "创建视频"
+    }
+  },
+  "152": {
+    "inputs": {
+      "filename_prefix": "video/MiniMax_H3",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "151",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "保存视频"
+    }
+  },
+  "157": {
+    "inputs": {
+      "sage_attention": "auto",
+      "allow_compile": false,
+      "model": [
+        "192",
+        0
+      ]
+    },
+    "class_type": "PathchSageAttentionKJ",
+    "_meta": {
+      "title": "Patch Sage Attention KJ"
+    }
+  },
+  "164": {
+    "inputs": {
+      "enable_fp16_accumulation": false,
+      "model": [
+        "157",
+        0
+      ]
+    },
+    "class_type": "ModelPatchTorchSettings",
+    "_meta": {
+      "title": "Model Patch Torch Settings"
+    }
+  },
+  "191": {
+    "inputs": {
+      "processing_control_value": 0.08,
+      "processing_percent_1": 0.1,
+      "processing_percent_2": 0.9,
+      "mcs": 2,
+      "device": "auto",
+      "mode": "4-step LoRA",
+      "model": [
+        "164",
+        0
+      ]
+    },
+    "class_type": "TESpeedMiniMaxH3",
+    "_meta": {
+      "title": "TE-Speed-MiniMaxH3"
+    }
+  },
+  "192": {
+    "inputs": {
+      "lora_name": "minimax_h3_turbo_v4_step600_ema.safetensors",
+      "strength_model": 0.75,
+      "model": [
+        "127",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderBypassModelOnly",
+    "_meta": {
+      "title": "加载LoRA（旁路，仅模型）（用于调试）"
+    }
+  }
+}

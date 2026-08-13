@@ -1,0 +1,26 @@
+{
+  "skill_name": "oh-my-minimaxh3-director",
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-script-full-pipeline",
+      "prompt": "我有一段 60 秒的短视频剧本（txt 在 outputs/my-story/script.txt）：讲一个咖啡师在打烊后遇到外星人，6 段、每段 10 秒。请用 oh-my-minimaxh3-director 走完整流程：先探测/开隧道，自动分镜生成 storyboard 和 H3 提示词，分配 Ref2VA/T2V 工作流并让我确认参数，然后提交生成并拼成剪映草稿。",
+      "expected_output": "在 outputs/my-story/ 生成 storyboard.md/json、prompts/seg_01..06.txt、workflows/seg_01..06_api.json、jobs/params.json；参数表展示并确认后提交；片段下载到 clips/raw/；最终生成并运行 assemble_jianying_my-story.py，剪映草稿保存成功且 edit/jianying-draft-report.json 存在。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "existing-storyboard-regression",
+      "prompt": "星海圣战-剧本完整包-修订版/sc2-5min-dawn 里已有 storyboard.md 和 prompts/seg_01.txt~seg_30.txt。不要重新分镜，直接用 oh-my-minimaxh3-director 把这些段分配到 H3 工作流并生成参数表（refs 参考图目录已存在）。",
+      "expected_output": "build_workflows.py 读取已有 storyboard/prompts，生成 workflows/seg_01..30_api.json 与 jobs/params.json；有参考图的段路由 ref2va、无图段路由 t2v；参数表 30 行可确认，不重写 storyboard.md。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "param-change-and-invalid-rejection",
+      "prompt": "把 outputs/my-story/storyboard.json 的 seg_03 时长改成 20 秒、seg_04 steps 改成 100，再跑 build_workflows.py；然后把时长改回 12 秒、steps 改成 16 重新跑。",
+      "expected_output": "第一轮后端校验拒绝超范围参数（时长 5-15、steps 4-40）且不生成工作流；第二轮成功生成且 seg_03 length=288 帧、seg_04 steps=16，params.json 反映新值。",
+      "files": []
+    }
+  ]
+}
