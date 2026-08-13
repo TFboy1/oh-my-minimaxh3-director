@@ -96,6 +96,23 @@ python scripts/generate_assembly.py --project <Projekt> --title <Titel>
 
 Modelle insgesamt ~40 GB; NVIDIA-GPU + CUDA erforderlich; 60 GB+ freier Speicher empfohlen.
 
+## Credits
+
+Dieses Skill steht auf den Schultern dieser Open-Source-Projekte:
+
+- [MiniMax H3](https://github.com/MiniMax-AI/MiniMax-H3) (MiniMax-AI): Modell und
+  `h3-prompt-writing`-Skill (MiniMax-H3-Community-Lizenz);
+- [ComfyUI](https://github.com/Comfy-Org/ComfyUI): Generierungs-Engine (GPL-3.0);
+- [jianying-editor-skill](https://github.com/luoluoluo22/jianying-editor-skill)
+  (luoluoluo22): JianYing-Montage über JyWrapper (MIT);
+- [comfy-mcp](https://github.com/Comfy-Org/comfy-mcp) (Comfy-Org): ComfyUI-MCP-Server
+  (AGPL-3.0-or-later OR Commercial);
+- [cloudflared](https://github.com/cloudflare/cloudflared) (Cloudflare): Tunnel (Apache-2.0).
+
+Vollständige Liste: [CONTRIBUTORS.md](../CONTRIBUTORS.md)
+
 ## Lizenz
 
-Modellgewichte unter der MiniMax-H3-Community-Lizenz; der Skill-Code unter MIT.
+Der Skill-Code ist unter **MIT** lizenziert — siehe [LICENSE](../LICENSE).
+Modellgewichte folgen der MiniMax-H3-Community-Lizenz; Upstream-Komponenten
+behalten ihre eigenen Lizenzen.

@@ -134,6 +134,26 @@ oh-my-minimaxh3-director/
 - **Custom templates**: convert UI-format workflows with `convert_ui_workflow.py` and put
   the API-format JSON into `templates_dir`.
 
+## Credits
+
+This project stands on the shoulders of these open-source projects:
+
+- [MiniMax H3](https://github.com/MiniMax-AI/MiniMax-H3) (MiniMax-AI): the model and the
+  `h3-prompt-writing` skill, under the MiniMax H3 community license;
+- [Comfy-Org/minimax-H3](https://www.modelscope.cn/models/Comfy-Org/minimax-H3): ModelScope
+  repackaged models for fast downloads in China;
+- [ComfyUI](https://github.com/Comfy-Org/ComfyUI): video generation engine, GPL-3.0;
+- [jianying-editor-skill](https://github.com/luoluoluo22/jianying-editor-skill)
+  (luoluoluo22): JianYing assembly via JyWrapper, MIT;
+- [comfy-mcp](https://github.com/Comfy-Org/comfy-mcp) (Comfy-Org): ComfyUI MCP server,
+  AGPL-3.0-or-later OR Commercial;
+- [cloudflared](https://github.com/cloudflare/cloudflared) (Cloudflare): remote tunnels,
+  Apache-2.0.
+
+Full list: [CONTRIBUTORS.md](../CONTRIBUTORS.md)
+
 ## License
 
-Model weights follow the MiniMax H3 community license; the skill code is MIT licensed.
+The skill code is open-sourced under the **MIT** license — see [LICENSE](../LICENSE).
+Model weights follow the MiniMax H3 community license; upstream components
+(ComfyUI, comfy-mcp, jianying-editor-skill, cloudflared) keep their own licenses.

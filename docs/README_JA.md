@@ -90,6 +90,22 @@ python scripts/generate_assembly.py --project <プロジェクト> --title <タ�
 
 モデル合計約 40GB。NVIDIA GPU + CUDA 必須、ディスク 60GB+ 推奨。
 
+## クレジット
+
+本スキルは以下のオープンソースプロジェクトの上に成り立っています：
+
+- [MiniMax H3](https://github.com/MiniMax-AI/MiniMax-H3)（MiniMax-AI）：モデル本体と
+  `h3-prompt-writing` スキル（MiniMax H3 コミュニティライセンス）；
+- [ComfyUI](https://github.com/Comfy-Org/ComfyUI)：生成エンジン（GPL-3.0）；
+- [jianying-editor-skill](https://github.com/luoluoluo22/jianying-editor-skill)
+  （luoluoluo22）：剪映編集 JyWrapper（MIT）；
+- [comfy-mcp](https://github.com/Comfy-Org/comfy-mcp)（Comfy-Org）：ComfyUI MCP
+  サーバー（AGPL-3.0-or-later OR Commercial）；
+- [cloudflared](https://github.com/cloudflare/cloudflared)（Cloudflare）：トンネル（Apache-2.0）。
+
+一覧：[CONTRIBUTORS.md](../CONTRIBUTORS.md)
+
 ## ライセンス
 
-モデル重みは MiniMax H3 コミュニティライセンス、スキルコードは MIT。
+スキルコードは **MIT** ライセンスで公開（[LICENSE](../LICENSE)）。
+モデル重みは MiniMax H3 コミュニティライセンス、上流コンポーネントは各ライセンスに従います。

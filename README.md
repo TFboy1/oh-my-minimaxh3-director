@@ -131,6 +131,26 @@ oh-my-minimaxh3-director/
 - **想加自定义模板**：用 `convert_ui_workflow.py` 把 UI 格式工作流转成 API
   格式，放进 `templates_dir` 即可。
 
+## 致谢 (Credits)
+
+本项目站在以下开源项目的肩膀上：
+
+- [MiniMax H3](https://github.com/MiniMax-AI/MiniMax-H3)（MiniMax-AI）：模型本体与
+  `h3-prompt-writing` 提示词 skill，遵循 MiniMax H3 社区许可；
+- [Comfy-Org/minimax-H3](https://www.modelscope.cn/models/Comfy-Org/minimax-H3)：
+  ModelScope 重打包，国内直连下载；
+- [ComfyUI](https://github.com/Comfy-Org/ComfyUI)：视频生成推理引擎，GPL-3.0；
+- [jianying-editor-skill](https://github.com/luoluoluo22/jianying-editor-skill)
+  （luoluoluo22）：剪映自动拼合 JyWrapper，MIT；
+- [comfy-mcp](https://github.com/Comfy-Org/comfy-mcp)（Comfy-Org）：ComfyUI MCP
+  服务，AGPL-3.0-or-later OR Commercial；
+- [cloudflared](https://github.com/cloudflare/cloudflared)（Cloudflare）：远程
+  隧道，Apache-2.0。
+
+完整名单见 [CONTRIBUTORS.md](CONTRIBUTORS.md)。
+
 ## License
 
-模型权重遵循 MiniMax H3 社区许可；本 skill 代码按 MIT 提供。
+本 skill 代码以 **MIT** 协议开源，完整文本见 [LICENSE](LICENSE)。
+模型权重遵循 MiniMax H3 社区许可；上游组件（ComfyUI、comfy-mcp、
+jianying-editor-skill、cloudflared）以各自许可证为准。
