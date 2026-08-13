@@ -184,6 +184,170 @@ def apply_common_params(
     segment["filename_prefix"] = prefix
 
 
+def validate_hybrid_meta(
+    meta: dict,
+    segments: list[dict],
+    characters: list[dict],
+    strict: bool,
+) -> None:
+    """Backend checks for hybrid meta (signature / units / shots / rhythm / sound / anchors)."""
+    problems: list[str] = []
+    total = sum(
+        float(s.get("duration", meta.get("duration_default", 10)))
+        for s in segments
+    )
+    declared = meta.get("total_duration")
+    if declared is not None:
+        declared_f = float(declared)
+        if abs(total - declared_f) > declared_f * 0.05:
+            problems.append(
+                f"段时长累加 {total:.1f}s 与 meta.total_duration {declared_f:g}s 偏差 >5%"
+            )
+    sig = meta.get("audiovisual_signature")
+    if isinstance(sig, dict):
+        color_ids = sig.get("color_ids") or []
+        if isinstance(color_ids, (list, dict)) and len(color_ids) > 6:
+            problems.append("视听签名 color_ids 超过 6 个")
+        master = sig.get("master_dna") or []
+        if isinstance(master, (list, tuple)) and len(master) > 3:
+            problems.append("视听签名 master_dna 超过 3 位")
+        if not str(sig.get("core_theme", "")).strip():
+            problems.append("视听签名缺少 core_theme（必须可拍成画面）")
+        for field in ("medium", "aspect", "texture", "genre_formula"):
+            if not sig.get(field):
+                problems.append(f"视听签名缺少 {field}")
+    climax = meta.get("climax_segment")
+    if climax is not None:
+        try:
+            target = int(climax)
+            starts = 0.0
+            found = False
+            for segment in segments:
+                duration = float(segment.get("duration", meta.get("duration_default", 10)))
+                if int(segment["id"]) == target:
+                    found = True
+                    break
+                starts += duration
+            if found and total > 0:
+                position = starts / total
+                if not 0.60 <= position <= 0.80:
+                    problems.append(
+                        f"高潮段 {target} 起始位置 {position:.0%} 不在全片 60-80%"
+                    )
+            elif not found:
+                problems.append(f"meta.climax_segment={target} 不存在")
+        except (TypeError, ValueError, KeyError):
+            problems.append("meta.climax_segment 格式错误")
+    events = meta.get("sound_events")
+    if isinstance(events, list):
+        if len(events) > 12:
+            problems.append("sound_events 超过 12 个")
+        for index, event in enumerate(events, 1):
+            if not isinstance(event, dict) or not str(event.get("time", "")).strip() or not str(event.get("event", "")).strip():
+                problems.append(f"sound_events 第 {index} 项缺少 time/event")
+    shot_segments: list[tuple[int, list[dict]]] = []
+    for segment in segments:
+        seg_id = int(segment["id"])
+        shots = segment.get("shots")
+        if not isinstance(shots, list) or not shots:
+            continue
+        shot_segments.append((seg_id, shots))
+        expected_no = 1
+        shot_total = 0.0
+        for index, shot in enumerate(shots, 1):
+            if not isinstance(shot, dict):
+                problems.append(f"seg {seg_id} shots 第 {index} 项不是对象")
+                continue
+            missing = [
+                key for key in ("no", "time", "duration", "shot_size", "camera", "content", "sound")
+                if not str(shot.get(key, "")).strip()
+            ]
+            if missing:
+                problems.append(f"seg {seg_id} 镜头卡缺字段: {missing}")
+            if shot.get("no") != expected_no:
+                problems.append(f"seg {seg_id} 镜号不连续: 期望 {expected_no} 实际 {shot.get('no')}")
+            expected_no += 1
+            try:
+                shot_total += float(shot["duration"])
+            except (TypeError, ValueError, KeyError):
+                problems.append(f"seg {seg_id} 镜头卡 duration 非数字")
+        seg_dur = float(segment.get("duration", meta.get("duration_default", 10)))
+        if abs(shot_total - seg_dur) > seg_dur * 0.05:
+            problems.append(
+                f"seg {seg_id} 镜头时长累加 {shot_total:.1f}s 与段长 {seg_dur:g}s 偏差 >5%"
+            )
+    if shot_segments:
+        try:
+            import statistics
+            per_seg_asl: dict[int, float] = {}
+            for seg_id, shots in shot_segments:
+                durations = [float(shot["duration"]) for shot in shots]
+                per_seg_asl[seg_id] = sum(durations) / len(durations)
+            shot_count = sum(len(shots) for _, shots in shot_segments)
+            total_sec = sum(
+                float(shot["duration"])
+                for _, shots in shot_segments
+                for shot in shots
+            )
+            whole_asl = total_sec / shot_count if shot_count else 0.0
+            if whole_asl:
+                for seg_id, asl in per_seg_asl.items():
+                    if asl > whole_asl * 1.5 or asl < whole_asl * 0.5:
+                        problems.append(
+                            f"seg {seg_id} ASL {asl:.1f}s 偏离全片均值 {whole_asl:.1f}s >50%（需诊断）"
+                        )
+                if len(per_seg_asl) >= 2:
+                    sigma = statistics.pstdev(list(per_seg_asl.values()))
+                    if sigma < 0.3:
+                        problems.append(f"全片 σ={sigma:.2f} 过平（<0.3）")
+                    elif sigma > 1.5:
+                        problems.append(f"全片 σ={sigma:.2f} 过抖（>1.5）")
+        except (TypeError, ValueError, ZeroDivisionError):
+            problems.append("节奏统计失败：镜头卡 duration 异常")
+    anchors = meta.get("world_anchors")
+    if isinstance(anchors, dict):
+        required_anchor_keys = ("origin", "equipment", "energy", "rule", "support")
+        for key in required_anchor_keys:
+            if not str(anchors.get(key, "")).strip():
+                problems.append(f"world_anchors 缺少 {key}")
+        for key in anchors:
+            if key not in required_anchor_keys:
+                problems.append(f"world_anchors 存在未知 slot: {key}")
+            elif "出处" not in str(anchors.get(key, "")):
+                problems.append(f"world_anchors.{key} 缺少出处标注")
+    ref_films = meta.get("reference_films")
+    if isinstance(ref_films, list):
+        if len(ref_films) > 6:
+            problems.append("reference_films 超过 6 部（建议精简）")
+        for index, item in enumerate(ref_films, 1):
+            if not isinstance(item, dict) or not str(item.get("title", "")).strip() or not str(item.get("usage", "")).strip():
+                problems.append(f"reference_films 第 {index} 项缺少 title/usage")
+    for character in characters:
+        if not isinstance(character, dict):
+            continue
+        name = character.get("name", "?")
+        visible = character.get("visible_shots")
+        if isinstance(visible, (list, tuple)):
+            valid_ids = {int(segment["id"]) for segment in segments}
+            for ref in visible:
+                num = ref if isinstance(ref, int) else None
+                if isinstance(ref, str) and ref.strip().isdigit():
+                    num = int(ref.strip())
+                if num is not None and num not in valid_ids:
+                    problems.append(f"角色 {name} visible_shots 引用不存在段号: {ref}")
+        dialogue_count = character.get("dialogue_count")
+        if dialogue_count is not None:
+            try:
+                float(dialogue_count)
+            except (TypeError, ValueError):
+                problems.append(f"角色 {name} dialogue_count 非数字")
+    for problem in problems:
+        console(f"[build] hybrid meta 警告: {problem}")
+    if strict and problems:
+        raise RuntimeError(
+            "hybrid meta 校验失败（strict_prompt_validation）: " + "; ".join(problems)
+        )
+
 def validate_prompt_depth(prompt: str, mode: str, seg_id: int, strict: bool) -> None:
     """Backend check for prompt depth per mode (warnings; hard-fail when strict)."""
     problems: list[str] = []
@@ -258,6 +422,12 @@ def build(project: Path, templates_dir: Path, selected: set[int] | None) -> dict
     segments = storyboard.get("segments", [])
     if not segments:
         raise SystemExit("storyboard.json 没有 segments")
+    validate_hybrid_meta(
+        meta,
+        segments,
+        storyboard.get("characters") or [],
+        bool(meta.get("strict_prompt_validation", False)),
+    )
 
     workflow_dir = project / "workflows"
     workflow_dir.mkdir(parents=True, exist_ok=True)

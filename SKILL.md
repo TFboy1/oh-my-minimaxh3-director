@@ -111,7 +111,12 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
      负向约束块），规范见
      [wenwu-director.md](references/wenwu-director.md) 的「hybrid：官方
      六段式 × WenWu 导演深度」，完整示例见
-     [hybrid-example.md](references/hybrid-example.md)。
+     [hybrid-example.md](references/hybrid-example.md)。项目还可附带
+     视听签名 `audiovisual_signature`、声音事件表 `sound_events`、
+     7 列镜头卡 `shots`（含机位库/运镜库/转场库/高级技法）、节奏统计、
+     世界锚点 `world_anchors`、参考片样本 `reference_films`、
+     `climax_segment` 与 `total_duration`，规范见
+     [storyboard-schema.md](references/storyboard-schema.md)。
    - `wenwu`：用户明确提到导演 / 分镜衔接 / 镜头设计 / 表演 / WenWu，或
      要求纯中文导演分镜提示词时使用（WenWu 成片书写法）。
    - `official`：仅用于快速批量、无强风格要求的段级生成。
@@ -136,6 +141,7 @@ scheduler、种子、分辨率与输出前缀，做后端校验（时长 5-15s�
 `jobs/params.json`，并打印参数汇总表。
 提示词深度也做后端校验：六段齐全、镜头标记与时间码、hybrid 的
 `constraints:` 块；`meta.strict_prompt_validation: true` 时不达标直接拒绝。
+hybrid meta 另做后端校验：视听签名字段、段时长累加、高潮位置与声音事件表。
 
 ## 阶段 3：参数确认
 

@@ -122,3 +122,90 @@ pure 2D cel + flat editorial MG only; no 3D, no volume modeling, no real-space d
 - 每段结尾有 `constraints:` 风格与负向约束块；
 - 中文画面文字（UI / 标题）原样保留在引号内，对白（如有）放在 `<d>` 内；
 - 20 秒简报拆成 2×10s，段间硬切并在文字锚点交接，不引用上一段尾帧。
+
+## hybrid meta 扩展字段示例（FINAL TIDE · 深海幻境）
+
+同一份提示词可以附带以下 meta，供 build_workflows 后端校验与跨段一致性：
+
+```json
+{
+  "meta": {
+    "total_duration": 60,
+    "climax_segment": 5,
+    "audiovisual_signature": {
+      "medium": "数字 + 模拟 35mm 颗粒 LUT",
+      "aspect": "16:9 (Widescreen)",
+      "color_ids": { "少女": "珍珠白+幻彩青", "深海墨影": "紫黑+金箔", "深海": "墨蓝黑+珊瑚粉" },
+      "texture": ["粒子透光", "墨色流动", "金箔闪光", "留白"],
+      "core_theme": "少女把梦之珠投入最后一道潮汐",
+      "master_dna": ["宫崎骏", "田晓鹏(粒子水墨)"],
+      "genre_formula": { "opening": "月光与珍珠", "turn": "墨影推潮", "climax": "珍珠投入漩涡", "ending": "潮汐退去" }
+    },
+    "sound_events": [
+      { "time": "0:00", "event": "深海低频基底 + 鲸歌" },
+      { "time": "0:12", "event": "第一个高频锚点：气泡叮" },
+      { "time": "0:24", "event": "仪式启动音：珍珠发光嗡鸣" },
+      { "time": "0:38", "event": "第一次撞击：潮汐波纹撞击" },
+      { "time": "0:46", "event": "高潮前中频群：鱼群急流" },
+      { "time": "0:30", "event": "关键 V.O.：无（服务沉默主题）" },
+      { "time": "0:50", "event": "第一次静默：珍珠投入瞬间" },
+      { "time": "0:53", "event": "静默回归：虹光嗡鸣逐层恢复" },
+      { "time": "0:55", "event": "主题动作音：主题旋律完整出现" },
+      { "time": "0:58", "event": "高潮余震：低频+高频残响" },
+      { "time": "0:59", "event": "全片唯一：最响一击（虹光爆发）" },
+      { "time": "1:00", "event": "结尾尾音：潮汐落定 + 一声气泡" }
+    ]
+  }
+}
+```
+
+映射方式：color_ids 进入每段 `subject_definitions`；texture 进入
+`detailed_description` 开头风格句；sound_events 拆进各段
+`overall_soundscape` / `non_diegetic_music`；genre_formula 决定段表与
+summary 的节拍走向。
+
+## 镜头卡 / 节奏 / 世界锚点示例（FINAL TIDE · seg_01）
+
+```json
+{
+  "meta": {
+    "world_anchors": {
+      "origin": "深海幻境由最后一道月光潮汐维持（出处: seg_01）",
+      "equipment": "梦之珠：由月光与星尘凝成的发光珍珠（出处: seg_01）",
+      "energy": "潮汐退去前珠光耗尽，约 60 秒（出处: seg_06）",
+      "rule": "珍珠必须由守护者亲手投入漩涡（出处: seg_05）",
+      "support": "水母群与鱼群环绕护航，无外部援军（出处: seg_02）"
+    }
+  },
+  "segments": [
+    {
+      "id": 1,
+      "duration": 10,
+      "shots": [
+        { "no": 1, "time": "0:00", "duration": 3.5, "shot_size": "极端特写", "camera": "水下 · 慢推", "content": "月光穿海面，珍珠粒子坠落，光透缝隙", "sound": "深海低频+气泡", "tags": ["海报帧"] },
+        { "no": 2, "time": "0:03.5", "duration": 3.5, "shot_size": "中景", "camera": "平视 · 缓移", "content": "少女由粒子聚墨成形于月光之路，掌托珍珠", "sound": "鲸歌+粒子嗡鸣", "tags": [] },
+        { "no": 3, "time": "0:07", "duration": 3.0, "shot_size": "特写", "camera": "推镜", "content": "眼部粒子特写，UI 文字 FINAL TIDE", "sound": "低频脉冲渐强", "tags": ["关键"] }
+      ]
+    }
+  ]
+}
+```
+
+节奏示例：seg_01 共 3 镜，段 ASL = 10/3 ≈ 3.3s；若全片 6 段平均
+ASL ≈ 2.0s，则 seg_01 偏离 >50%，需在节奏表中注明“开场慢推建立月光
+意象，属合理呼吸段”。镜头卡内容直接翻译成 `detailed_description`
+的 `[Shot N]` 脉冲，声音列进入 `overall_soundscape`，保持官方六段式
+外壳 + WenWu 内容标准。
+
+## 参考片样本示例（FINAL TIDE · 深海幻境）
+
+```json
+"reference_films": [
+  { "title": "深海", "director": "田晓鹏", "year": 2023, "usage": "粒子水墨：无数粒子堆积成水墨形态、粒子透光呼吸感、岩彩高饱和梦幻色", "source": "用户指定" },
+  { "title": "蜘蛛侠：平行宇宙", "director": "Bob Persichetti", "year": 2018, "usage": "Editorial MG 平面动效、漫画分屏、图形转场", "source": "skill 推荐" },
+  { "title": "辉夜姬物语", "director": "高畑勋", "year": 2013, "usage": "水墨留白写意、手绘笔触与负空间", "source": "skill 推荐" }
+]
+```
+
+参考片用途要写“具体借什么”，不能只写“风格参考”；这些条目同时支撑
+`audiovisual_signature` 的 medium/texture/master_dna 与转场库选型。
