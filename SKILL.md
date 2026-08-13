@@ -14,6 +14,35 @@ description: AI 视频导演流水线：剧本自动分镜 → MiniMax H3 工作
 v1 只服务 MiniMax H3 的 Ref2VA / T2V / I2V 三种模板，段级生成，默认无字幕无
 BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 下运行。
 
+## 首次使用引导（Onboarding）
+
+第一次使用（以用户目录下的 `~/.oh-my-minimaxh3-director.json` 是否存在判断）
+时，按下面顺序逐项与用户确认，**每一项先说明用途再询问**，不替用户做决定；
+完成后把选择写入该配置文件。非首次且用户启用自动更新时，每次使用前先
+`npx skills update oh-my-minimaxh3-director -g -y`（失败不阻塞流程）。
+
+1. **自动更新**：说明用途（每次使用前自动拉取本 skill 的最新脚本、模板与
+   教程），询问是否启用。推荐启用；选项：启用 / 不启用 / 每次询问。
+2. **ComfyUI 检测**：先运行 `scripts/probe_comfy.py --workspace <工作区根>`
+   自动探测（本机 8188、已有隧道、AutoDL）。探测不到时询问“是否已安装
+   ComfyUI”；未安装则按 [setup-guide.md](references/setup-guide.md) 第 1 节
+   给出官网桌面版下载教程（https://www.comfy.org/download）。
+3. **硬件评估**：运行 `scripts/check_hardware.py` 检测 NVIDIA 显存、内存与
+   磁盘；本机无独显但已有远程 ComfyUI（隧道/AutoDL）时改用
+   `--remote-url <地址>` 直接评估远程 GPU。若判定不适合（显存 < 12GB 或
+   没有 NVIDIA GPU），明确告知用户，并询问是改用云 GPU（AutoDL / Comfy
+   Cloud）还是仍想尝试；远程可用时流水线不受影响。
+4. **MiniMax H3 模型**：本地 ComfyUI 且未确认过模型时，询问“是否已下载
+   MiniMax H3 模型”；未下载则按 [setup-guide.md](references/setup-guide.md)
+   第 2 节给 ModelScope 教程（仓库 `Comfy-Org/minimax-H3`，含文件清单、
+   放置目录与约 40GB 空间提示）。
+5. **可选依赖**：逐个说明用途后询问是否安装——
+   - `h3-prompt-writing`：专业改写 H3 六段式提示词，提升分镜质量；
+   - `jianying-editor`：剪映草稿自动拼合（本 skill 拼合阶段依赖）；
+   - `comfy-mcp`：让 Codex 直接管理/运行 ComfyUI，可选增强。
+   需要安装时按 [setup-guide.md](references/setup-guide.md) 第 4 节执行；
+   明确拒绝的记录下来，之后不再反复询问。
+
 ## 输入与项目结构
 
 输入：剧本文件（`.md` / `.txt`，或对话中的故事文本），可选参考图目录
@@ -35,7 +64,8 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 分镜 JSON 结构与提示词格式见
 [storyboard-schema.md](references/storyboard-schema.md)；模板路由与字段映射见
 [workflow-routing.md](references/workflow-routing.md)；隧道操作见
-[cloudflared.md](references/cloudflared.md)。
+[cloudflared.md](references/cloudflared.md)；首次安装与硬件评估见
+[setup-guide.md](references/setup-guide.md)。
 
 ## 阶段 0：探测 ComfyUI 与可选隧道
 
@@ -137,3 +167,4 @@ python scripts/generate_assembly.py --project <项目目录> --title <片名> \
 | `submit_jobs.py` | 上传资产并批量提交 |
 | `monitor_jobs.py` | 轮询下载、失败重试、断点续跑 |
 | `generate_assembly.py` | 生成剪映拼合业务脚本 |
+| `check_hardware.py` | 检测 GPU/内存/磁盘并给出本地运行建议 |
