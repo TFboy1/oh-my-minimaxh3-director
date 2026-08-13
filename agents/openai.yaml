@@ -1,4 +1,4 @@
 interface:
   display_name: "我的导演"
-  short_description: "剧本分镜、MiniMax H3 生成、参数确认、剪映拼合与 Cloudflare 隧道"
+  short_description: "剧本分镜（官方 H3 × WenWu 导演深度）、MiniMax H3 生成、参数确认、剪映拼合与 Cloudflare 隧道"
   default_prompt: "使用 $oh-my-minimaxh3-director 把剧本自动分镜并生成 H3 视频，最后拼成剪映草稿。"

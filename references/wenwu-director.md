@@ -1,20 +1,43 @@
 # 分镜导演模式（WenWu 生镜引擎，泛化到任意秒数）
 
-除官方 H3 六段式写法外，本 skill 提供第二种提示词模式：**WenWu 生镜导演
-引擎**。它把模型当作「在镜头里做选择的人」，而不是「执行动作的工具」，
-输出可直接驱动 MiniMax H3 的**中文分镜提示词**。默认片长 15 秒，本文档把
-其密度与镜头规则泛化到任意秒数。
+本 skill 提供三种提示词模式：官方 H3 六段式（official）、WenWu 生镜导演
+引擎（wenwu，中文分镜提示词），以及两者兼顾的 hybrid（官方六段式外壳 +
+WenWu 导演级内容）。WenWu 引擎把模型当作「在镜头里做选择的人」，而不是
+「执行动作的工具」；hybrid 模式让官方格式获得同样的导演深度。默认片长
+15 秒，本文档把密度与镜头规则泛化到任意秒数。
 
-## 两种模式怎么选
+## 三种模式怎么选
 
 | 模式 | 适用 | 提示词语言 | 输出结构 |
 |---|---|---|---|
-| 官方 H3 模式（默认） | 快速批量、段级生成（每段一个 H3 视频） | 英文六段式 | `prompts/seg_XX.txt`（subject_definitions / summary / retention_analysis / detailed_description / overall_soundscape / non_diegetic_music） |
-| WenWu 导演模式 | 精细分镜、镜头衔接、人物戏、需要导演级表演 | 中文分镜提示词 | `prompts/seg_XX.txt`（WenWu 成片书写法） |
+| `official`（默认） | 快速批量、无强风格要求 | 英文六段式 | `prompts/seg_XX.txt`（subject_definitions / summary / retention_analysis / detailed_description / overall_soundscape / non_diegetic_music） |
+| `wenwu` | 用户点名导演/分镜衔接/镜头设计/表演/WenWu，或要求纯中文导演分镜 | 中文分镜提示词 | `prompts/seg_XX.txt`（WenWu 成片书写法） |
+| `hybrid`（推荐） | 游戏 PV / 宣传片 / 广告 / 短片 / 强风格简报（风格系统、色彩系统、音乐编排、逐秒分镜、负向约束） | 英文六段式 + WenWu 内容标准 | `prompts/seg_XX.txt`（官方六段式外壳，内容按 WenWu 导演标准） |
 
-用户提到「导演」「分镜衔接」「镜头设计」「表演」「WenWu」或要求更精细的
-镜头语言时，默认启用 WenWu 导演模式；否则用官方模式。两种模式都遵守同一套
-分镜流程（询问故事 → 衔接分镜 → 人物四视图 → 写提示词）。
+选择规则：用户提到「导演」「分镜衔接」「镜头设计」「表演」「WenWu」→
+`wenwu`；任务属性是 PV / 宣传片 / 广告 / 短片，或简报含风格系统、色彩
+系统、音乐编排、逐秒分镜、负向约束 → `hybrid`；只有快速批量且无强风格
+要求时用 `official`。模式决策理由写入 `meta.prompt_mode_reason`。
+
+## hybrid：官方六段式 × WenWu 导演深度（两者兼顾）
+
+hybrid 不是把中文翻译成英文，而是让 WenWu 的导演标准进入官方外壳：
+
+| WenWu 概念 | 六段落位 |
+|---|---|
+| 生命核 | `subject_definitions`（身份、色彩系统、素材职责） |
+| 最终发展线 | `summary` |
+| 八条生命通道 | `retention_analysis`（逐条核对保留关系） |
+| 镜头脉冲 | `detailed_description`（编号镜头 + 起止时间 + 景别机位 + 唯一事件 + 主体变化 + 摄影机回应 + 交镜锚点） |
+| 表演肌理 / 状态肌理 | `detailed_description` 对应镜头内 |
+| 声音脉络 | `overall_soundscape`（环境/动作/声桥）+ `non_diegetic_music`（BPM/乐器/进入与停止时间） |
+| 视觉母题 / 风格禁令 | `detailed_description` 开头风格句 + 结尾 `constraints:` 块 |
+
+hybrid 下 detailed_description 仍用英文写（H3 对英文提示词最稳定），原生
+中文对白与画面文字原样保留在 `<d>` 或引号内；镜头时间首尾相接且总和精确
+等于段长；超过 15 秒的简报按 5-15s 段拆解，段间用硬切并在文字锚点交接，
+禁止引用上一段尾帧。完整示例见 [hybrid-example.md](hybrid-example.md)。
+三种模式都遵守同一套分镜流程（询问故事 → 衔接分镜 → 人物四视图 → 写提示词）。
 
 ## 引擎身份
 

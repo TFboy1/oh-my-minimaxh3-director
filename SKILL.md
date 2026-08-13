@@ -1,6 +1,6 @@
 ---
 name: oh-my-minimaxh3-director
-description: AI 视频导演流水线：剧本自动分镜（含 WenWu 导演级镜头衔接与人物四视图参考图）→ MiniMax H3 工作流分配与参数确认 → 批量生成监控 → 剪映自动拼合成片，可选 Cloudflare 隧道远程访问。用户提到剧本出片、自动分镜、分镜衔接、WenWu、人物四视图、H3 生成、工作流分配、剪映拼合、AI 导演或给出剧本/故事文本要求生成视频时使用。
+description: AI 视频导演流水线：剧本自动分镜（含 WenWu 导演级镜头衔接与人物四视图参考图）→ MiniMax H3 工作流分配与参数确认 → 批量生成监控 → 剪映自动拼合成片，可选 Cloudflare 隧道远程访问。提示词支持官方 H3 六段式（official）、WenWu 中文导演模式（wenwu），以及两者兼顾的 hybrid 模式（官方六段式外壳 + WenWu 导演级内容）。用户提到剧本出片、自动分镜、分镜衔接、WenWu、人物四视图、H3 生成、工作流分配、剪映拼合、AI 导演、游戏 PV/宣传片/广告短片/风格与音乐简报，或给出剧本/故事文本要求生成视频时使用。
 ---
 
 # ComfyUI 剧本视频流水线
@@ -44,7 +44,8 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
    第 2 节给 ModelScope 教程（仓库 `Comfy-Org/minimax-H3`，含文件清单、
    放置目录与约 40GB 空间提示）。
 5. **可选依赖**：逐个说明用途后询问是否安装——
-   - `h3-prompt-writing`：专业改写 H3 六段式提示词，提升分镜质量；
+   - `h3-prompt-writing`：专业改写 H3 六段式提示词（仅服务 official 与
+     hybrid 的六段式外壳；wenwu 纯中文模式不依赖它）；
    - `jianying-editor`：剪映草稿自动拼合（本 skill 拼合阶段依赖）；
    - `comfy-mcp`：让 Codex 直接管理/运行 ComfyUI，可选增强。
    需要安装时按 [setup-guide.md](references/setup-guide.md) 第 4 节执行；
@@ -59,7 +60,7 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 <项目>/
   storyboard.md          # 人读分镜
   storyboard.json        # 机器可读分镜（build_workflows 输入）
-  prompts/seg_01.txt …   # H3 六段式提示词
+  prompts/seg_01.txt …   # H3 提示词（official / wenwu / hybrid）
   workflows/seg_01_api.json …
   jobs/params.json       # 参数清单（确认对象）
   jobs/seg_01_job.json … # 提交/下载状态（断点恢复）
@@ -73,7 +74,8 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 [workflow-routing.md](references/workflow-routing.md)；隧道操作见
 [cloudflared.md](references/cloudflared.md)；首次安装与硬件评估见
 [setup-guide.md](references/setup-guide.md)；导演级分镜与 WenWu 引擎见
-[wenwu-director.md](references/wenwu-director.md)；无人值守与资源监控见
+[wenwu-director.md](references/wenwu-director.md)；hybrid 完整示例见
+[hybrid-example.md](references/hybrid-example.md)；无人值守与资源监控见
 [resource-monitoring.md](references/resource-monitoring.md)。
 
 ## 阶段 0：探测 ComfyUI 与可选隧道
@@ -98,12 +100,25 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 3. **生成人物参考图四视图**：模型支持生成图片时直接生成；角色是网上已有角色
    时先搜索下载参考图再生成——每角色三张不同视角全身 + 一张脸部特写，存到
    `refs/` 并在 `storyboard.json` 的 `characters` 登记。
-4. 按 `meta.prompt_mode` 为每段写 `prompts/seg_XX.txt`：
-   - `official`：H3 六段式英文提示词（subject_definitions / summary /
+4. **先做提示词模式决策，再写提示词**：写提示词前必须判断简报复杂度，并把
+   `meta.prompt_mode` 与 `meta.prompt_mode_reason` 写入 storyboard.json，
+   禁止静默走默认。三种模式：
+   - `hybrid`（推荐）：创意简报 / 游戏 PV / 宣传片 / 广告 / 短片默认。保持
+     官方 H3 六段式英文外壳（subject_definitions / summary /
      retention_analysis / detailed_description / overall_soundscape /
-     non_diegetic_music），原生中文对白写在 `<d>[Chinese] ...</d>`；
-   - `wenwu`：按 wenwu-director.md 写中文分镜提示词（编号镜头脉冲 + 表演/
-     状态肌理），镜头密度按任意秒数公式计算。
+     non_diegetic_music），内容按 WenWu 导演标准写（逐秒镜头脉冲、生命核、
+     八条生命通道、表演/状态肌理、音轨编排、结尾 `constraints:` 风格与
+     负向约束块），规范见
+     [wenwu-director.md](references/wenwu-director.md) 的「hybrid：官方
+     六段式 × WenWu 导演深度」，完整示例见
+     [hybrid-example.md](references/hybrid-example.md)。
+   - `wenwu`：用户明确提到导演 / 分镜衔接 / 镜头设计 / 表演 / WenWu，或
+     要求纯中文导演分镜提示词时使用（WenWu 成片书写法）。
+   - `official`：仅用于快速批量、无强风格要求的段级生成。
+   判断规则：简报含风格系统、色彩系统、音乐编排、逐秒分镜或负向约束，
+   或任务属性是 PV / 宣传片 / 广告 / 短片 → 必须 `hybrid`。
+   `h3-prompt-writing` 只用于 `official` 与 `hybrid` 的六段式外壳；
+   `wenwu` 纯中文模式不依赖它。
    参考图在提示词中用 `<Picture N>` 标签与 `refs` 数组对应。
 
 ## 阶段 2：工作流构建
@@ -119,6 +134,8 @@ python scripts/build_workflows.py --project <项目目录> --workspace <工作�
 scheduler、种子、分辨率与输出前缀，做后端校验（时长 5-15s、步数 4-40、
 种子范围、参考图存在、提示词非空），写出 `workflows/seg_XX_api.json` 和
 `jobs/params.json`，并打印参数汇总表。
+提示词深度也做后端校验：六段齐全、镜头标记与时间码、hybrid 的
+`constraints:` 块；`meta.strict_prompt_validation: true` 时不达标直接拒绝。
 
 ## 阶段 3：参数确认
 
@@ -191,7 +208,7 @@ python scripts/generate_assembly.py --project <项目目录> --title <片名> \
 | `probe_comfy.py` | 探测可用 ComfyUI 地址并写入配置 |
 | `ensure_cloudflared.py` | 复用/启动/停止 trycloudflare 隧道 |
 | `convert_ui_workflow.py` | UI 格式模板转 API 格式 |
-| `build_workflows.py` | 分镜 → 每段 API 工作流 + 参数表 |
+| `build_workflows.py` | 分镜 → 每段 API 工作流 + 参数表（含提示词深度校验） |
 | `submit_jobs.py` | 上传资产并批量提交 |
 | `monitor_jobs.py` | 轮询下载、失败重试、断点续跑 |
 | `generate_assembly.py` | 生成剪映拼合业务脚本 |

@@ -18,8 +18,12 @@
    - 输出约定：`refs/<角色名>_front.png`、`refs/<角色名>_side.png`、
      `refs/<角色名>_back.png`、`refs/<角色名>_face.png`；在 `storyboard.json`
      的 `characters` 与段落 `refs` 中登记。
-4. **写每个分镜的 H3 规范提示词**：按 `meta.prompt_mode` 选择官方 H3 六段式
-   （英文）或 WenWu 导演模式（中文分镜提示词），格式见下文。
+4. **先做提示词模式决策，再写提示词**：按 `meta.prompt_mode` 选择
+   `official` / `wenwu` / `hybrid`，并把决策理由写入 `meta.prompt_mode_reason`。
+   - `hybrid`：官方 H3 六段式英文外壳 + WenWu 导演级内容（推荐用于 PV /
+     宣传片 / 广告 / 短片 / 强风格简报），格式见下文「模式 C」；
+   - `wenwu`：中文 WenWu 成片书写法（用户点名导演/分镜/表演/WenWu 时）；
+   - `official`：快速批量、无强风格要求时使用。
 
 提示词模式选择与 WenWu 引擎完整规则见
 [wenwu-director.md](wenwu-director.md)。
@@ -45,7 +49,9 @@
     "default_steps": 8,
     "default_seed": 123456789,
     "batch": "sc2-5min-dawn",
-    "prompt_mode": "wenwu"
+    "prompt_mode": "wenwu",
+    "prompt_mode_reason": "用户点名导演级分镜衔接，使用 WenWu 成片书写法",
+    "strict_prompt_validation": false
   },
   "characters": [
     {
@@ -81,7 +87,11 @@
 
 - `meta.aspect` 必须是 ComfyUI ResolutionSelector 的选项之一（如
   `16:9 (Widescreen)`、`9:16 (Portrait Widescreen)`）。
-- `meta.prompt_mode`：`official`（默认）或 `wenwu`，决定提示词写法。
+- `meta.prompt_mode`：`official`（默认）/ `wenwu` / `hybrid`，决定提示词写法。
+- `meta.prompt_mode_reason`：模式决策理由（hybrid / wenwu 建议必填），随
+  params.json 输出，便于复核。
+- `meta.strict_prompt_validation`：可选布尔；为 true 时 build_workflows 对
+  提示词深度校验不合格直接拒绝（默认只警告）。
 - `characters[]`：每个主要角色的四视图文件（front / side / back / face），
   四视图锁定的身份信息必须写进提示词的 subject_definitions 或 WenWu 生命核。
 - `segments[].id` 从 1 开始连续编号，文件名用两位数（`seg_01`）。
@@ -158,6 +168,30 @@ non_diegetic_music:
 追加「表演肌理」（心理目的、保护层、呼吸、台词触发、面部微调 AU），无人产品
 片改为「状态肌理」。
 
+### 模式 C：hybrid（官方六段式 × WenWu 导演深度）（`prompt_mode: hybrid`）
+
+六段顺序、字段名、语言和标签与模式 A 完全一致（英文书写），但每段内容按
+WenWu 导演标准写：
+
+- `subject_definitions` = 生命核：锁定角色/场景/道具的身份、色彩系统、平面
+  设计语言与素材职责（`<Subject N>` / `<Picture N>`）；
+- `summary` = 最终发展线：段内 2-3 镜的完整时间线概要；
+- `retention_analysis` = 八条生命通道核对：逐条写每个主体的保留关系
+  （fully_preserved / partially_preserved / attribute_transfer / weak_reference）；
+- `detailed_description` = 编号镜头脉冲：每个镜头写起止时间、景别机位、
+  唯一事件、主体变化、摄影机回应、交镜锚点；人物片加表演肌理（心理目的、
+  保护层、呼吸、台词触发、FACS AU），无人片加状态肌理；镜头时间首尾相接，
+  总时长精确等于段长；
+- `overall_soundscape` = 环境层 + 动作音 + 声桥；
+- `non_diegetic_music` = 音乐编排：BPM、乐器、进入/变化/停止时间点；无音乐
+  写 N/A；
+- 末尾必须追加一行 `constraints:` 风格与负向约束块（例如 pure 2D、no 3D、
+  no depth、no realistic lighting、no real casino…）。
+
+完整示例见 [hybrid-example.md](hybrid-example.md)。build_workflows.py 会校验
+六段齐全、`[Shot` 时间码与 `constraints:` 块；`meta.strict_prompt_validation:
+true` 时不达标直接拒绝。
+
 ## 段级生成原则（v1 固定）
 
 - 每段 = 一个 H3 视频，默认 10 秒，段内 2-3 个分镜由提示词驱动，段间用硬切
@@ -166,9 +200,9 @@ non_diegetic_music:
   声桥 / 受力）；段间换新机位但同样保留一个跨段锚点，禁止无理由跳切。
 - 提示词内禁止「参考上一段尾帧/续拍」，每段独立生成（衔接靠文字锚点，不靠
   画面引用）。
-- WenWu 模式下段内镜头数与单镜时长按「任意秒数密度公式」计算：高动态
-  0.4-1.5s/镜、细腻文戏 2-4s/镜、混合片 1.5-3s/镜；用户指定镜头结构时精确
-  遵守。
+- WenWu 与 hybrid 模式下段内镜头数与单镜时长按「任意秒数密度公式」计算：
+  高动态 0.4-1.5s/镜、细腻文戏 2-4s/镜、混合片 1.5-3s/镜；用户指定镜头结构
+  时精确遵守。
 - 默认无字幕、无 BGM，原生对白直出；如用户要求字幕/BGM，在拼合阶段另行处理。
 - 参考图清单与提示词标签的映射必须写进提示词（如 `<Picture 1>` →
   refs/ref_zelan.png）。
