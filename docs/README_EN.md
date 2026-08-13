@@ -13,9 +13,12 @@ an automated pipeline: storyboard → MiniMax H3 generation → one-click JianYi
 
 ## Features
 
-- 🎬 **Automatic storyboarding**: Feed it a script or story text and it splits it into
-  segments (10s each by default, 2-3 shots per segment), generating `storyboard.md`,
-  `storyboard.json`, and H3 six-part prompts.
+- 🎬 **Automatic storyboarding (WenWu director engine)**: Asks for your story, then
+  generates a storyboard with **shot-to-shot continuity anchors**, generates
+  **character four-view sheets** (three full-body angles + one face close-up, via
+  image generation or web-sourced reference), and writes H3 prompts — in either the
+  official six-part English format or the WenWu Chinese director format, with shot
+  density adapting to any duration.
 - 🎞️ **MiniMax H3 workflow routing**: Automatically routes to Ref2VA (reference images),
   T2V (pure text), or I2V (first/last frames), and patches prompt, duration, steps, seed,
   resolution, and output prefix by `class_type` — never hard-coded node IDs.
@@ -69,8 +72,10 @@ In Codex, just say:
 Then provide a script file or story text. Pipeline:
 
 ```text
-script/story → storyboard → H3 workflows → parameter confirmation → submit & generate
-→ download clips → JianYing draft → (optional) auto export
+script/story → story requirements → storyboard (with continuity) → character
+four-view reference sheets → H3 prompts (official / WenWu) → H3 workflows
+→ parameter confirmation → submit & generate → download clips
+→ JianYing draft → (optional) auto export
 ```
 
 Manual step-by-step:

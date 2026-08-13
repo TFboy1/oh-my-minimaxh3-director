@@ -28,6 +28,13 @@
       "prompt": "我第一次用 oh-my-minimaxh3-director，想把自己的剧本做成视频。我还没装 ComfyUI，也不知道我的电脑能不能跑 MiniMax H3。",
       "expected_output": "依次说明用途并询问：是否启用自动更新；探测/询问 ComfyUI 并给出官网桌面版下载教程；运行 check_hardware.py 评估硬件并给出结论；给 ModelScope 模型下载教程；逐个说明用途后询问是否安装 h3-prompt-writing、jianying-editor 与 comfy-mcp；把选择写入 ~/.oh-my-minimaxh3-director.json。",
       "files": []
+    },
+    {
+      "id": 5,
+      "name": "wenwu-storyboard-and-character-sheets",
+      "prompt": "用 oh-my-minimaxh3-director 做一个 30 秒的悬疑短片：深夜便利店店员遇到一个会复读顾客话语的神秘客人。角色是网上已有的原创角色，帮我搜参考图并生成四视图，分镜要上下镜头衔接，提示词用 WenWu 导演模式。",
+      "expected_output": "先询问/确认故事要点；生成 30s 衔接分镜（文戏密度约 8-12 镜）；搜索并下载参考角色图到 refs/，生成四视图（front/side/back/face）；storyboard.json 的 prompt_mode=wenwu 且 characters 登记四视图；prompts/seg_XX.txt 按 WenWu 成片书写法输出中文分镜提示词，镜头密度按 30s 计算，镜头间写明衔接锚点。",
+      "files": []
     }
   ]
 }

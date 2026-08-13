@@ -1,6 +1,6 @@
 ---
 name: oh-my-minimaxh3-director
-description: AI 视频导演流水线：剧本自动分镜 → MiniMax H3 工作流分配与参数确认 → 批量生成监控 → 剪映自动拼合成片，可选 Cloudflare 隧道远程访问。用户提到剧本出片、自动分镜、H3 生成、工作流分配、剪映拼合、AI 导演或给出剧本/故事文本要求生成视频时使用。
+description: AI 视频导演流水线：剧本自动分镜（含 WenWu 导演级镜头衔接与人物四视图参考图）→ MiniMax H3 工作流分配与参数确认 → 批量生成监控 → 剪映自动拼合成片，可选 Cloudflare 隧道远程访问。用户提到剧本出片、自动分镜、分镜衔接、WenWu、人物四视图、H3 生成、工作流分配、剪映拼合、AI 导演或给出剧本/故事文本要求生成视频时使用。
 ---
 
 # ComfyUI 剧本视频流水线
@@ -65,7 +65,8 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 [storyboard-schema.md](references/storyboard-schema.md)；模板路由与字段映射见
 [workflow-routing.md](references/workflow-routing.md)；隧道操作见
 [cloudflared.md](references/cloudflared.md)；首次安装与硬件评估见
-[setup-guide.md](references/setup-guide.md)。
+[setup-guide.md](references/setup-guide.md)；导演级分镜与 WenWu 引擎见
+[wenwu-director.md](references/wenwu-director.md)。
 
 ## 阶段 0：探测 ComfyUI 与可选隧道
 
@@ -80,17 +81,22 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 
 ## 阶段 1：剧本 → 分镜
 
-1. 读剧本，必要时提取角色/单位/场景设定，创建 `outputs/<项目名>/`。
-2. 按 storyboard-schema.md 生成 `storyboard.md` 与 `storyboard.json`：把剧本
-   切段（默认每段 10 秒，5-15 秒可调），每段包含 2-3 个分镜、台词、节拍、
-   参考图映射与生成模式。
-3. 为每段写 `prompts/seg_XX.txt`：严格使用 H3 六段式
-   （subject_definitions / summary / retention_analysis /
-   detailed_description / overall_soundscape / non_diegetic_music），
-   包含“three clearly separated shots with visible cuts between them”约束，
-   原生中文对白写在 `<d>[Chinese] ...</d>`，无 BGM 时音乐层写 N/A。
-4. 参考图放 `refs/`，并在提示词中用 `<Picture N>` 标签与
-   `storyboard.json` 的 `refs` 数组对应。
+1. **询问故事要求**：片长、风格、目标平台、角色/参考图、是否指定镜头结构；
+   用户意图足够明确时直接创作，不连续追问。
+2. 创建 `outputs/<项目名>/`，按 storyboard-schema.md 生成衔接分镜：
+   把剧本切段（默认每段 10 秒，5-15 秒可调），每段 2-3 个分镜，上下镜头之间
+   写清衔接锚点（动作方向 / 视线 / 光线 / 道具 / 轮廓 / 声桥 / 受力），禁止
+   无理由跳切。
+3. **生成人物参考图四视图**：模型支持生成图片时直接生成；角色是网上已有角色
+   时先搜索下载参考图再生成——每角色三张不同视角全身 + 一张脸部特写，存到
+   `refs/` 并在 `storyboard.json` 的 `characters` 登记。
+4. 按 `meta.prompt_mode` 为每段写 `prompts/seg_XX.txt`：
+   - `official`：H3 六段式英文提示词（subject_definitions / summary /
+     retention_analysis / detailed_description / overall_soundscape /
+     non_diegetic_music），原生中文对白写在 `<d>[Chinese] ...</d>`；
+   - `wenwu`：按 wenwu-director.md 写中文分镜提示词（编号镜头脉冲 + 表演/
+     状态肌理），镜头密度按任意秒数公式计算。
+   参考图在提示词中用 `<Picture N>` 标签与 `refs` 数组对应。
 
 ## 阶段 2：工作流构建
 
