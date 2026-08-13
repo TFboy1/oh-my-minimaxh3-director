@@ -111,6 +111,20 @@ def main() -> int:
 
     console(f"[monitor] ComfyUI: {base_url} | batch: {batch} | retry_limit: {retry_limit}")
     while True:
+        resource_path = project / "jobs" / "resource_state.json"
+        if resource_path.exists():
+            resource = load_json(resource_path)
+            if resource.get("level") == "stop":
+                console(
+                    f"[monitor] 资源监控达到 stop 阈值"
+                    f"（GPU {resource.get('gpu', {}).get('vram_pct')}% / "
+                    f"RAM {resource.get('ram_pct')}%），暂停本轮，请释放显存或"
+                    f"按约定时间关机"
+                )
+                if args.once:
+                    return 2
+                time.sleep(poll_seconds)
+                continue
         pending = 0
         unrecoverable = 0
         state_segments: dict[str, dict] = {}

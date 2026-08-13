@@ -66,7 +66,8 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 [workflow-routing.md](references/workflow-routing.md)；隧道操作见
 [cloudflared.md](references/cloudflared.md)；首次安装与硬件评估见
 [setup-guide.md](references/setup-guide.md)；导演级分镜与 WenWu 引擎见
-[wenwu-director.md](references/wenwu-director.md)。
+[wenwu-director.md](references/wenwu-director.md)；无人值守与资源监控见
+[resource-monitoring.md](references/resource-monitoring.md)。
 
 ## 阶段 0：探测 ComfyUI 与可选隧道
 
@@ -119,6 +120,20 @@ scheduler、种子、分辨率与输出前缀，做后端校验（时长 5-15s�
 2. 用户可修改 `storyboard.json` 中的参数（时长、步数、种子、模板、参考图等）
    后重跑阶段 2；不要做前端表单，脚本后端校验非法值并拒绝。
 3. 用户确认后锁定参数，进入提交（`params.json` 保持为提交依据）。
+
+## 阶段 3.5：无人值守确认（每次批量开始前必做）
+
+每次开始批量提交前，**询问用户本次是否无人值守**：
+
+- **是**：与用户约定关机时间（本机 Windows 自动关机，或 AutoDL/云实例的到期
+  时间并提醒在云控制台设置）；把约定写入 `jobs/run_plan.json`；按
+  [resource-monitoring.md](references/resource-monitoring.md) 启动
+  `scripts/monitor_resources.py` 后台监控 GPU 显存与系统内存（默认 warn 90% /
+  stop 95%），到达约定时间且用户已授权时执行本机关机。
+- **否**：正常人工值守流程，跳过关机约定；资源监控可选。
+
+`monitor_jobs.py` 每轮会读取 `jobs/resource_state.json`，达到 stop 阈值时暂停
+本轮并报告，防止显存/内存爆掉。
 
 ## 阶段 4：提交、监控与下载
 
@@ -174,3 +189,4 @@ python scripts/generate_assembly.py --project <项目目录> --title <片名> \
 | `monitor_jobs.py` | 轮询下载、失败重试、断点续跑 |
 | `generate_assembly.py` | 生成剪映拼合业务脚本 |
 | `check_hardware.py` | 检测 GPU/内存/磁盘并给出本地运行建议 |
+| `monitor_resources.py` | 无人值守时监控 GPU 显存/内存，支持约定时间关机 |
