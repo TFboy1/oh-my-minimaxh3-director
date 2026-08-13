@@ -1,0 +1,132 @@
+<svg width="1280" height="360" viewBox="0 0 1280 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04050d"/>
+      <stop offset="0.45" stop-color="#0b0a24"/>
+      <stop offset="1" stop-color="#180a33"/>
+    </linearGradient>
+    <radialGradient id="nebulaViolet" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#a855f7" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="nebulaCyan" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="nebulaPink" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f472b6" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#f472b6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="titleGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset="0.5" stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+    <linearGradient id="tagGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="0"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0.55"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" stroke="#a78bfa" stroke-opacity="0.12" fill="none"/>
+    </pattern>
+    <clipPath id="frameClip">
+      <rect x="0" y="0" width="1280" height="360"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frameClip)">
+    <rect width="1280" height="360" fill="url(#bg)"/>
+
+    <!-- 星云 -->
+    <circle cx="240" cy="120" r="260" fill="url(#nebulaViolet)"/>
+    <circle cx="980" cy="80" r="300" fill="url(#nebulaCyan)"/>
+    <circle cx="700" cy="320" r="280" fill="url(#nebulaPink)"/>
+
+    <!-- 透视网格 -->
+    <rect y="200" width="1280" height="160" fill="url(#horizon)"/>
+    <g stroke="#a78bfa" stroke-opacity="0.18">
+      <line x1="0" y1="360" x2="640" y2="205"/>
+      <line x1="1280" y1="360" x2="640" y2="205"/>
+      <line x1="160" y1="360" x2="640" y2="215"/>
+      <line x1="1120" y1="360" x2="640" y2="215"/>
+      <line x1="320" y1="360" x2="640" y2="230"/>
+      <line x1="960" y1="360" x2="640" y2="230"/>
+      <line x1="480" y1="360" x2="640" y2="252"/>
+      <line x1="800" y1="360" x2="640" y2="252"/>
+      <path d="M 0 235 L 1280 235 M 0 272 L 1280 272 M 0 315 L 1280 315"/>
+    </g>
+
+    <!-- 星点（含闪烁） -->
+    <g fill="#e0f2fe">
+      <circle cx="80" cy="60" r="1.6"><animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" repeatCount="indefinite"/></circle>
+      <circle cx="180" cy="180" r="1.2"><animate attributeName="opacity" values="1;0.2;1" dur="3.1s" repeatCount="indefinite"/></circle>
+      <circle cx="300" cy="42" r="1.8"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.9s" repeatCount="indefinite"/></circle>
+      <circle cx="430" cy="120" r="1.1"/>
+      <circle cx="560" cy="52" r="1.5"><animate attributeName="opacity" values="1;0.25;1" dur="2.7s" repeatCount="indefinite"/></circle>
+      <circle cx="720" cy="90" r="1.3"/>
+      <circle cx="850" cy="40" r="1.7"><animate attributeName="opacity" values="0.4;1;0.4" dur="2.2s" repeatCount="indefinite"/></circle>
+      <circle cx="1000" cy="150" r="1.2"/>
+      <circle cx="1120" cy="58" r="1.6"><animate attributeName="opacity" values="1;0.3;1" dur="3.4s" repeatCount="indefinite"/></circle>
+      <circle cx="1210" cy="130" r="1.1"/>
+      <circle cx="150" cy="250" r="1"/>
+      <circle cx="1150" cy="230" r="1.3"/>
+    </g>
+
+    <!-- 左侧取景框装饰 -->
+    <g stroke="url(#tagGrad)" stroke-width="2" opacity="0.85">
+      <path d="M 34 84 L 34 44 Q 34 34 44 34 L 84 34" fill="none"/>
+      <path d="M 204 34 L 244 34 Q 254 34 254 44 L 254 84" fill="none"/>
+      <path d="M 254 236 L 254 276 Q 254 286 244 286 L 204 286" fill="none"/>
+      <path d="M 84 286 L 44 286 Q 34 286 34 276 L 34 236" fill="none"/>
+    </g>
+    <circle cx="144" cy="42" r="4" fill="#f87171" filter="url(#glow)">
+      <animate attributeName="opacity" values="1;0.35;1" dur="1.6s" repeatCount="indefinite"/>
+    </circle>
+    <text x="144" y="58" fill="#fca5a5" font-family="Consolas, monospace" font-size="12" letter-spacing="2">REC</text>
+    <text x="50" y="258" fill="#c4b5fd" font-family="Consolas, monospace" font-size="12" letter-spacing="3">DIRECTOR&apos;S CUT</text>
+
+    <!-- 主标题 -->
+    <text x="640" y="172" text-anchor="middle" fill="url(#titleGrad)" filter="url(#softGlow)"
+          font-family="ui-monospace, 'Cascadia Code', Consolas, monospace"
+          font-size="56" font-weight="700" letter-spacing="1">oh-my-minimaxh3-director</text>
+
+    <!-- 副标语 -->
+    <text x="640" y="216" text-anchor="middle" fill="#e2e8f0" opacity="0.92"
+          font-family="ui-monospace, 'Cascadia Code', Consolas, monospace"
+          font-size="19" letter-spacing="6">SCRIPT IN . REEL OUT</text>
+
+    <!-- 标签行 -->
+    <g font-family="Consolas, monospace" font-size="13" letter-spacing="2" fill="#94a3b8">
+      <text x="640" y="262" text-anchor="middle">
+        <tspan fill="url(#tagGrad)">MINIMAX H3</tspan>
+        <tspan fill="#475569">  //  </tspan>
+        <tspan fill="url(#tagGrad)">COMFYUI</tspan>
+        <tspan fill="#475569">  //  </tspan>
+        <tspan fill="url(#tagGrad)">JIANYING</tspan>
+        <tspan fill="#475569">  //  </tspan>
+        <tspan fill="url(#tagGrad)">CLOUDFLARE</tspan>
+      </text>
+    </g>
+
+    <!-- 底部光带 -->
+    <rect x="0" y="352" width="1280" height="8" fill="url(#titleGrad)" opacity="0.85"/>
+  </g>
+</svg>

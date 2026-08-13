@@ -1,7 +1,17 @@
-# oh-my-minimaxh3-director
+<p align="center">
+  <img src="banner.svg" alt="oh-my-minimaxh3-director Banner" width="100%"/>
+</p>
 
-**你的 AI 视频导演。** 把剧本交给我，把成片还给你——剧本自动分镜 →
+[![Skills.sh](https://img.shields.io/badge/Skills.sh-Install%20Skill-00C853?style=for-the-badge&logo=hackthebox&logoColor=white)](https://skills.sh/tfboy1/oh-my-minimaxh3-director/oh-my-minimaxh3-director) [![爱发电](https://img.shields.io/badge/爱发电-Support%20Me-FF69B4?style=for-the-badge&logo=buy-me-a-coffee&logoColor=white)](https://www.ifdian.net/) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-☕-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/) [![GitHub Stars](https://img.shields.io/github/stars/tfboy1/oh-my-minimaxh3-director?style=for-the-badge&logo=github&color=yellow)](https://github.com/TFboy1/oh-my-minimaxh3-director/stargazers) [![License](https://img.shields.io/github/license/tfboy1/oh-my-minimaxh3-director?style=for-the-badge&color=blue)](LICENSE)
+
+[![MiniMax H3](https://img.shields.io/badge/MiniMax-H3-c084fc?style=flat-square)](https://www.modelscope.cn/models/Comfy-Org/minimax-H3) [![ComfyUI](https://img.shields.io/badge/ComfyUI-0.32%2B-22d3ee?style=flat-square)](https://www.comfy.org/) [![JianYing](https://img.shields.io/badge/JianYing-auto-f472b6?style=flat-square)](#) [![Cloudflare Tunnel](https://img.shields.io/badge/Cloudflare-Tunnel-f97316?style=flat-square)](#)
+
+[![简体中文](https://img.shields.io/badge/简体中文-当前语言-red?style=flat-square)](#) [![English](https://img.shields.io/badge/English-README-blue?style=flat-square)](docs/README_EN.md) [![日本語](https://img.shields.io/badge/日本語-README-blue?style=flat-square)](docs/README_JA.md) [![Français](https://img.shields.io/badge/Français-README-blue?style=flat-square)](docs/README_FR.md) [![Deutsch](https://img.shields.io/badge/Deutsch-README-blue?style=flat-square)](docs/README_DE.md)
+
+<p align="center">
+你的 AI 视频导演。把剧本交给我，把成片还给你——剧本自动分镜 →
 MiniMax H3 生成 → 剪映一键拼合的全自动流水线。
+</p>
 
 ## 功能特性
 
