@@ -28,7 +28,8 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
      探测本机 8188；未安装时按 [setup-guide.md](references/setup-guide.md)
      第 1 节给出官网桌面版下载教程（https://www.comfy.org/download）。
    - **云端**：请用户提供网址链接（trycloudflare 隧道地址或 AutoDL 的
-     seetacloud 地址），用
+     seetacloud 地址；还没有 AutoDL 实例时按
+     [autodl-cloud.md](references/autodl-cloud.md) 帮其开通云端算力），用
      `scripts/probe_comfy.py --workspace <工作区根> --url <链接> --write`
      验证并把该地址写入 `.config/pipeline-config.json` 的 `base_url`；
      链接失效时回退到自动探测。
@@ -37,8 +38,9 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 3. **硬件评估**：运行 `scripts/check_hardware.py` 检测 NVIDIA 显存、内存与
    磁盘；本机无独显但已有远程 ComfyUI（隧道/AutoDL）时改用
    `--remote-url <地址>` 直接评估远程 GPU。若判定不适合（显存 < 12GB 或
-   没有 NVIDIA GPU），明确告知用户，并询问是改用云 GPU（AutoDL / Comfy
-   Cloud）还是仍想尝试；远程可用时流水线不受影响。
+   没有 NVIDIA GPU），明确告知用户，并询问是改用云 GPU（AutoDL，教程见
+   [autodl-cloud.md](references/autodl-cloud.md) / Comfy Cloud）还是仍想
+   尝试；远程可用时流水线不受影响。
 4. **MiniMax H3 模型**：本地 ComfyUI 且未确认过模型时，询问“是否已下载
    MiniMax H3 模型”；未下载则按 [setup-guide.md](references/setup-guide.md)
    第 2 节给 ModelScope 教程（仓库 `Comfy-Org/minimax-H3`，含文件清单、
@@ -156,7 +158,8 @@ hybrid meta 另做后端校验：视听签名字段、段时长累加、高潮�
 每次开始批量提交前，**询问用户本次是否无人值守**：
 
 - **是**：与用户约定关机时间（本机 Windows 自动关机，或 AutoDL/云实例的到期
-  时间并提醒在云控制台设置）；把约定写入 `jobs/run_plan.json`；按
+  时间——云端关机按 [autodl-cloud.md](references/autodl-cloud.md) 用 API
+  `power_off` 或在云控制台设置）；把约定写入 `jobs/run_plan.json`；按
   [resource-monitoring.md](references/resource-monitoring.md) 启动
   `scripts/monitor_resources.py` 后台监控 GPU 显存与系统内存（默认 warn 90% /
   stop 95%），到达约定时间且用户已授权时执行本机关机。

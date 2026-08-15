@@ -96,7 +96,9 @@ python scripts/check_hardware.py --remote-url https://<隧道或AutoDL地址>
 - 需要 NVIDIA GPU + CUDA 驱动；int8_convrot 权重需要 PyTorch cu130（ComfyUI
   0.30+ / Comfy Desktop 自带）。
 - 系统内存建议 32GB+；模型下载约 40GB，生成视频也占磁盘。
-- 显存不足时的替代：AutoDL 租卡（`run_b35_*` 脚本就是远程用法）、Comfy Cloud。
+- 显存不足时的替代：AutoDL 租卡（教程与 API 见
+  [autodl-cloud.md](autodl-cloud.md)；`run_b35_*` 脚本就是远程用法）、
+  Comfy Cloud。
 
 ## 4. 可选依赖（逐个询问，说明用途后再装）
 

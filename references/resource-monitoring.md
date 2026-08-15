@@ -6,8 +6,8 @@
 
 - **是（无人值守）**：
   1. 与用户**约定关机时间**（HH:MM）：本机运行则约定 Windows 自动关机时间；
-     AutoDL / 云实例则约定实例到期时间（并提醒用户在 AutoDL 控制台设置到期
-     自动关机，脚本无法代操作云控制台）。
+     AutoDL / 云实例则约定实例到期时间（云端关机用 API `power_off` 或控制台
+     定时关机，见 [autodl-cloud.md](autodl-cloud.md)）。
   2. 把约定写入 `<项目>/jobs/run_plan.json`：
      `{"unattended": true, "shutdown_at": "23:00", "agreed_by_user": true}`。
   3. 启动资源监控（后台）：

@@ -42,6 +42,13 @@
       "prompt": "参数确认完了，开始批量跑 30 段吧。我要去睡觉，跑完如果还没到 23:00 就自动关机。",
       "expected_output": "提交前先确认无人值守：把 23:00 写入 jobs/run_plan.json（unattended=true、shutdown_at=23:00、agreed_by_user=true）；启动 monitor_resources.py 后台监控（远程 URL 或本机 GPU，阈值 90/95，--shutdown-at 23:00 --allow-shutdown）；再执行 submit_jobs.py 与 monitor_jobs.py；资源达到 stop 阈值时暂停并报告，23:00 触发关机提示/执行。",
       "files": []
+    },
+    {
+      "id": 7,
+      "name": "autodl-cloud-onboarding",
+      "prompt": "我的电脑只有核显跑不动 H3，想用云端算力，但我从没用过 AutoDL。帮我开通一个能跑 ComfyUI 的实例，并说明大概费用。",
+      "expected_output": "按 references/autodl-cloud.md 引导：告知注册与 Token 获取地址（https://www.autodl.com/console/center/settings/token）；推荐控制台方式选择 ComfyUI 应用与按量计费、起步 5090-32G；说明按量计费只有开机才收费、示例价格与磁盘建议；实例启动后把服务地址交回 skill 用 probe_comfy.py --url 验证写入 pipeline-config；可选 API 方式（create/power_on/power_off/release 与规格 ID 表）；Token 写入 .config/autodl-config.json 且不进 git。",
+      "files": []
     }
   ]
 }
