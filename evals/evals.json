@@ -63,6 +63,13 @@
       "prompt": "提交一直报 node_errors，提示 UNETLoader 找不到模型；换了个隧道又 SSL 报错。别光重试，帮我查一下到底什么问题。",
       "expected_output": "按 references/api-and-mcp.md 排查表定位：node_errors 读 class_type 与消息，用 /object_info/UNETLoader 核对远程模型文件名并修正模板字段；SSL UNEXPECTED_EOF 属隧道抖动，重跑 probe_comfy.py 或 ensure_cloudflared.py 换隧道/回退直连；连续 3 次无变化停止并向用户报告，不盲目重试浪费 token。",
       "files": []
+    },
+    {
+      "id": 10,
+      "name": "storyboard-report-precision",
+      "prompt": "分镜和提示词都写完了，把剧本汇报给我看看。",
+      "expected_output": "按 storyboard-schema.md 的「分镜汇报格式」汇报：逐镜头给出起止时间（几秒到几秒）、画面内容、对白内容，时间连续且首镜 00:00 开始、末镜结束于总时长；不使用“开场/中间/结尾”式宽泛概括；用户指出要改的镜头后只重述该镜头及其前后衔接。",
+      "files": []
     }
   ]
 }

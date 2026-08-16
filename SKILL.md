@@ -129,6 +129,12 @@ ComfyUI API 调用与 comfy-mcp 见
    `h3-prompt-writing` 只用于 `official` 与 `hybrid` 的六段式外壳；
    `wenwu` 纯中文模式不依赖它。
    参考图在提示词中用 `<Picture N>` 标签与 `refs` 数组对应。
+5. **分镜汇报（必须按秒段）**：分镜与提示词写完后，向用户汇报剧本时必须
+   逐段给出**精确时间轴**——「几秒到几秒 → 什么画面 → 什么对白」，禁止用
+   “前面是开场、中间打斗、结尾反转”这类宽泛概括。汇报格式见
+   [storyboard-schema.md](references/storyboard-schema.md) 的「分镜汇报
+   格式」；hybrid/wenwu 模式直接采用镜头卡里的 `time`/`duration`/`content`/
+   `sound` 与台词。用户据此确认或指出要改的镜头后再进入阶段 2。
 
 ## 阶段 2：工作流扫描、选择与构建
 
