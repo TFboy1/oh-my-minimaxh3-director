@@ -52,17 +52,33 @@ VALID_ASPECTS = {
 
 
 def load_template(templates_dir: Path, name: str, project: Path) -> dict:
+    """Load a template. User workflow paths (absolute or relative) take priority;
+    UI-format files are rejected with a conversion hint, never rewritten here."""
     candidate = Path(name)
     if not candidate.suffix:
         candidate = Path(name + ".json")
-    search_paths = [
-        candidate if candidate.is_absolute() else templates_dir / candidate,
-        project / "templates" / candidate,
-    ]
+    search_paths: list[Path] = []
+    if candidate.is_absolute():
+        search_paths.append(candidate)
+    else:
+        search_paths.extend(
+            [
+                project / candidate,
+                project / "templates" / candidate,
+                templates_dir / candidate,
+            ]
+        )
     for path in search_paths:
         if path.exists():
             data = load_json(path)
             if isinstance(data, dict):
+                if "nodes" in data and "links" in data:
+                    raise RuntimeError(
+                        f"模板 {path} 是 ComfyUI UI 格式（含 nodes/links）。"
+                        "按用户已有工作流优先原则，请先用 "
+                        "convert_ui_workflow.py 转换后再引用，脚本不会自动改写"
+                        "用户工作流文件。"
+                    )
                 return data
             raise RuntimeError(f"模板不是 JSON 对象: {path}")
     raise RuntimeError(
@@ -392,12 +408,22 @@ def validate_segment(segment: dict, meta: dict) -> None:
         raise RuntimeError(f"seg {segment['id']}: 未知比例 {aspect}")
 
 
-def resolve_mode_and_template(segment: dict, templates_dir: Path, project: Path) -> tuple[str, dict]:
+def resolve_mode_and_template(
+    segment: dict,
+    templates_dir: Path,
+    project: Path,
+    meta: dict,
+) -> tuple[str, dict]:
     refs = segment.get("refs") or []
     explicit = segment.get("template")
     mode = segment.get("mode")
+    workflow_map = meta.get("workflow_map") or {}
+    mapped = workflow_map.get(str(segment["id"]))
+    if not mapped and mode:
+        mapped = workflow_map.get(mode)
+    template_name = explicit or mapped
     if explicit and not mode:
-        mode = Path(explicit).stem
+        mode = Path(str(explicit)).stem
     if not mode:
         if refs:
             mode = "ref2va"
@@ -406,7 +432,8 @@ def resolve_mode_and_template(segment: dict, templates_dir: Path, project: Path)
         else:
             mode = "t2v"
     segment["mode"] = mode
-    template_name = explicit or mode
+    if not template_name:
+        template_name = mode
     workflow = load_template(templates_dir, template_name, project)
     return mode, workflow
 
@@ -455,7 +482,7 @@ def build(project: Path, templates_dir: Path, selected: set[int] | None) -> dict
             bool(meta.get("strict_prompt_validation", False)),
         )
 
-        mode, workflow = resolve_mode_and_template(segment, templates_dir, project)
+        mode, workflow = resolve_mode_and_template(segment, templates_dir, project, meta)
         workflow = copy.deepcopy(workflow)
         apply_common_params(workflow, segment, meta, project, prompt)
 

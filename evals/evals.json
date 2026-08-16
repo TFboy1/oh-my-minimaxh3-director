@@ -49,6 +49,20 @@
       "prompt": "我的电脑只有核显跑不动 H3，想用云端算力，但我从没用过 AutoDL。帮我开通一个能跑 ComfyUI 的实例，并说明大概费用。",
       "expected_output": "按 references/autodl-cloud.md 引导：告知注册与 Token 获取地址（https://www.autodl.com/console/center/settings/token）；推荐控制台方式选择 ComfyUI 应用与按量计费、起步 5090-32G；说明按量计费只有开机才收费、示例价格与磁盘建议；实例启动后把服务地址交回 skill 用 probe_comfy.py --url 验证写入 pipeline-config；可选 API 方式（create/power_on/power_off/release 与规格 ID 表）；Token 写入 .config/autodl-config.json 且不进 git。",
       "files": []
+    },
+    {
+      "id": 8,
+      "name": "workflow-scan-and-user-selection",
+      "prompt": "项目分镜做好了，先别急着生成。扫一下我已有的工作流，告诉我哪个适合这个 Ref2VA 项目，我选好了再构建。",
+      "expected_output": "运行 scan_workflows.py 扫描（项目 workflows/templates、工作区 workflows/pv1min_workflows、templates_dir），输出候选清单（格式/模式/参考图/Turbo/模型）；展示表格询问用户选择，禁止直接创建新工作流；用户选定后把映射写入 storyboard.json 的 meta.workflow_map 或 segments[].template，再运行 build_workflows.py；UI 格式候选提示先转换，不自动改写用户文件。",
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "api-error-diagnostics",
+      "prompt": "提交一直报 node_errors，提示 UNETLoader 找不到模型；换了个隧道又 SSL 报错。别光重试，帮我查一下到底什么问题。",
+      "expected_output": "按 references/api-and-mcp.md 排查表定位：node_errors 读 class_type 与消息，用 /object_info/UNETLoader 核对远程模型文件名并修正模板字段；SSL UNEXPECTED_EOF 属隧道抖动，重跑 probe_comfy.py 或 ensure_cloudflared.py 换隧道/回退直连；连续 3 次无变化停止并向用户报告，不盲目重试浪费 token。",
+      "files": []
     }
   ]
 }

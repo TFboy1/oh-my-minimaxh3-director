@@ -79,6 +79,8 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
 [wenwu-director.md](references/wenwu-director.md)；hybrid 完整示例见
 [hybrid-example.md](references/hybrid-example.md)；无人值守与资源监控见
 [resource-monitoring.md](references/resource-monitoring.md)。
+ComfyUI API 调用与 comfy-mcp 见
+[api-and-mcp.md](references/api-and-mcp.md)。
 
 ## 阶段 0：探测 ComfyUI 与可选隧道
 
@@ -128,19 +130,43 @@ BGM。所有文件 UTF-8，Python 使用项目 `.venv`（存在时），Windows 
    `wenwu` 纯中文模式不依赖它。
    参考图在提示词中用 `<Picture N>` 标签与 `refs` 数组对应。
 
-## 阶段 2：工作流构建
+## 阶段 2：工作流扫描、选择与构建
 
-运行：
+**铁律：优先复用用户已有的工作流，禁止自行创建新工作流。** 步骤如下：
+
+1. **扫描用户工作流**：
+
+```bash
+python scripts/scan_workflows.py --project <项目目录> --workspace <工作区根>
+```
+
+   扫描范围：`<项目>/workflows`、`<项目>/templates`、`<工作区>/workflows`、
+   `<工作区>/pv1min_workflows` 与 `pipeline-config.json` 的 `templates_dir`。
+   输出每个候选的格式（API/UI）、模式（ref2va / i2v / t2v / batch）、参考图
+   槽位、Turbo 标记与模型文件。
+2. **展示候选并询问用户**：把扫描结果整理成表格（编号 / 文件 / 模式 / 适合
+   场景）给用户，询问“用哪个工作流”。用户选定后把映射写入
+   `storyboard.json`：
+   - 整批统一：`meta.workflow_map = {"<mode>": "路径或模板名"}`；
+   - 按段指定：`meta.workflow_map = {"<段号>": "路径或模板名"}`，或直接在
+     该段写 `segments[].template`。
+3. **只有以下情况才用内置模板**（`assets/templates/` 的 ref2va / t2v /
+   i2v）：扫描结果为空，或用户明确表示没有合适工作流、愿意用内置模板。
+   内置模板也必须经用户确认，不允许静默替换。
+4. **构建**：
 
 ```bash
 python scripts/build_workflows.py --project <项目目录> --workspace <工作区根>
 ```
 
-脚本按段路由模板（有参考图 → `ref2va`；首尾帧 → `i2v`；纯文本 → `t2v`；
-`template` 显式指定时优先），按 class_type 覆盖提示词、参考图、时长、步数、
-scheduler、种子、分辨率与输出前缀，做后端校验（时长 5-15s、步数 4-40、
-种子范围、参考图存在、提示词非空），写出 `workflows/seg_XX_api.json` 和
-`jobs/params.json`，并打印参数汇总表。
+   模板解析优先级：`segments[].template` > `meta.workflow_map[段号]` >
+   `meta.workflow_map[mode]` > 内置模式推断（有参考图 → `ref2va`；首尾帧 →
+   `i2v`；纯文本 → `t2v`）。按 class_type 覆盖提示词、参考图、时长、步数、
+   scheduler、种子、分辨率与输出前缀，做后端校验（时长 5-15s、步数 4-40、
+   种子范围、参考图存在、提示词非空），写出 `workflows/seg_XX_api.json` 和
+   `jobs/params.json`，并打印参数汇总表。
+   用户工作流是 UI 格式时脚本会明确报错，要求先用 `convert_ui_workflow.py`
+   转换——**脚本绝不自动改写用户工作流文件**。
 提示词深度也做后端校验：六段齐全、镜头标记与时间码、hybrid 的
 `constraints:` 块；`meta.strict_prompt_validation: true` 时不达标直接拒绝。
 hybrid meta 另做后端校验：视听签名字段、段时长累加、高潮位置与声音事件表。
@@ -178,6 +204,9 @@ python scripts/monitor_jobs.py --project <项目目录> --workspace <工作区�
 - `submit_jobs.py` 先上传本地参考图到远程 input 目录（同批次缓存去重），再
   POST `/prompt`；`node_errors` 非空时中止并报告缺什么。已提交/已下载的段
   自动跳过（`--force` 可重提），支持 `--segments 1,3` 部分提交。
+- **API 报错先查 [api-and-mcp.md](references/api-and-mcp.md) 排查表**：不要
+  盲目重试同一条命令，`node_errors` / 超时 / SSL EOF / 任务 error 各有对应
+  处理；连续 3 次无变化就停下来向用户报告。
 - `monitor_jobs.py` 轮询 `/history/{prompt_id}`：错误提取报错并按重试上限
   （默认 2 次）重新提交，完成后把 MP4 下载到
   `clips/raw/<batch>/seg_XX_00001-audio.mp4`；状态落盘，可断点续跑。
@@ -205,8 +234,9 @@ python scripts/generate_assembly.py --project <项目目录> --title <片名> \
 
 - 断点：`jobs/` 下所有状态为 JSON，重跑任意阶段都幂等跳过已完成段。
 - 隧道抖动：探测失败自动回退；`ensure_cloudflared.py --stop` 可停隧道。
-- 模板：内置三套 H3 紧凑模板；大模板（如 270KB 多图 Ref2VA）先经
-  `convert_ui_workflow.py` 转 API 格式再放入 `templates_dir`。
+- 模板：**用户已有工作流优先**（scan_workflows.py 扫描 + 用户确认）；内置
+  三套 H3 紧凑模板只是兜底；大模板（如 270KB 多图 Ref2VA）先经
+  `convert_ui_workflow.py` 转 API 格式再引用，不自动改写用户文件。
 - 本 skill 不做前端验证；所有合法性检查由脚本后端完成。
 - 不在 skill 目录内创建任何业务脚本/项目文件；业务产物一律放用户项目目录。
 
@@ -218,6 +248,7 @@ python scripts/generate_assembly.py --project <项目目录> --title <片名> \
 | `ensure_cloudflared.py` | 复用/启动/停止 trycloudflare 隧道 |
 | `convert_ui_workflow.py` | UI 格式模板转 API 格式 |
 | `build_workflows.py` | 分镜 → 每段 API 工作流 + 参数表（含提示词深度校验） |
+| `scan_workflows.py` | 扫描用户已有工作流并给出候选清单（模式/格式/参考图） |
 | `submit_jobs.py` | 上传资产并批量提交 |
 | `monitor_jobs.py` | 轮询下载、失败重试、断点续跑 |
 | `generate_assembly.py` | 生成剪映拼合业务脚本 |

@@ -1,5 +1,39 @@
 # H3 工作流路由与字段映射
 
+## 用户工作流优先（铁律）
+
+**构建前必须先扫描用户已有工作流并让用户确认选择，禁止自行创建新工作流。**
+
+```bash
+python scripts/scan_workflows.py --project <项目目录> --workspace <工作区根>
+```
+
+扫描范围：`<项目>/workflows`、`<项目>/templates`、`<工作区>/workflows`、
+`<工作区>/pv1min_workflows` 与 `pipeline-config.json` 的 `templates_dir`。
+每个候选会标注：格式（API / UI）、模式（ref2va / i2v / t2v / batch）、
+参考图槽位数、Turbo 标记、模型文件与输出前缀。
+
+用户选定后写入 `storyboard.json`：
+
+```json
+{
+  "meta": {
+    "workflow_map": {
+      "ref2va": "workflows/clip02_ref_api.json",
+      "3": "D:/.../pv1min_workflows/video_minimax_h3_r2v_v2.json"
+    }
+  }
+}
+```
+
+- `workflow_map` 的键可以是**模式名**（整批统一）或**段号字符串**（按段
+  指定）；段内 `segments[].template` 优先级最高。
+- 值可以是绝对路径、相对项目路径，或模板名（去 `.json`）。
+- UI 格式工作流必须先 `convert_ui_workflow.py` 转换；`build_workflows.py`
+  遇到 UI 格式会报错提示，**不会自动改写用户文件**。
+- 只有扫描结果为空或用户明确选择内置模板时，才使用
+  `assets/templates/`（ref2va / t2v / i2v）。
+
 ## 内置模板（assets/templates，API 格式）
 
 | 模板文件 | 路由条件 | 核心节点 |
@@ -8,7 +42,9 @@
 | `t2v.json` | 纯文本、无图 | `MiniMaxH3ImageToVideo` + `MiniMaxH3TurboLoRA` + `MiniMaxH3TurboSampler` |
 | `i2v.json` | 有 `first_frame`/`last_frame` | `MiniMaxH3ImageToVideo` + `LoadImage` + `ImageFromBatch` |
 
-路由优先级：`segments[].template` 显式指定 > `mode` 字段 > 推断（refs → ref2va；首尾帧 → i2v；否则 t2v）。
+路由优先级：`segments[].template` > `meta.workflow_map[段号]` >
+`meta.workflow_map[mode]` > 内置模式推断（refs → ref2va；首尾帧 → i2v；
+否则 t2v）。
 
 ## 参数覆盖（按 class_type，不写死节点 ID）
 
